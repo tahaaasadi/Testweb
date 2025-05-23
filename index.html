@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Website</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-flex">
+            <h1 id="quiz-title">انجمن علمی زیست شناسی دانشگاه زنجان</h1>
+            <img id="quiz-logo" src="logo.jpg" alt="Quiz Logo" style="display:none; border-radius: 100px; height:48px; margin-left:10px;">
+        </div>
+    </header>
+
+<div id="warning" style="display:none"></div>
+
+<main>
+        <section id="intro">
+            <div class="intro-box">
+                <h2 class="intro-title">تست شخصیت سلولی</h2>
+                <p class="intro-desc">
+                    تا حالا فکر کردی اگه یکی از سلول‌های بدن بودی، شبیه کدومشون می‌شدی؟<br>
+                    این تست کوتاه و سرگرم‌کننده بهت نشون می‌ده شخصیتت به کدوم سلول نزدیک‌تره!<br>
+                    فقط کافیه به چند سوال ساده جواب بدی و در آخر، نتیجه جالب و متفاوت خودت رو ببینی.
+                </p>
+                <button id="start-quiz-btn">شروع تست</button>
+                <div class="intro-footer">انجمن علمی زیست شناسی x طاها</div>
+            </div>
+        </section>
+        <section id="quiz" style="display:none;">
+            <div id="question"></div>
+            <div id="answers"></div>
+            <div id="quiz-buttons" style="display: flex; gap: 5px; justify-content: flex-end; margin-top:0px;">
+                <button id="prev-button">سوال قبل</button>
+                <button id="next-button">سوال بعد</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html>
