@@ -107,7 +107,33 @@ const questions = [
 let currentQuestion = 0;
 let userAnswers = []; // ذخیره انتخاب‌های کاربر
 
+function renderProgressBar(current) {
+  let progressBar = document.getElementById('progress-bar');
+  if (!progressBar) {
+    progressBar = document.createElement('div');
+    progressBar.id = 'progress-bar';
+    progressBar.className = 'progress-bar';
+  }
+  // ساخت نقطه‌ها
+  let dots = '';
+  for (let i = 0; i < questions.length; i++) {
+    dots += `<span class="progress-dot${i <= current ? ' active' : ''}"></span>`;
+  }
+  progressBar.innerHTML = dots;
+  // جابجایی پروگرس بار به بین answers و quiz-buttons
+  const answersDiv = document.getElementById('answers');
+  const quizButtons = document.getElementById('quiz-buttons');
+  if (answersDiv && quizButtons && progressBar.parentNode !== quizButtons.parentNode) {
+    // اطمینان از اینکه پروگرس بار فقط یک بار اضافه شود
+    if (progressBar.parentNode) progressBar.parentNode.removeChild(progressBar);
+    quizButtons.parentNode.insertBefore(progressBar, quizButtons);
+  } else if (answersDiv && quizButtons && progressBar.parentNode !== quizButtons.parentNode) {
+    quizButtons.parentNode.insertBefore(progressBar, quizButtons);
+  }
+}
+
 function showQuestion(index) {
+  renderProgressBar(index);
   const q = questions[index];
   document.getElementById('question').innerText = q.question;
   let answersDiv = document.getElementById('answers');
@@ -122,20 +148,57 @@ function showQuestion(index) {
     btn.className = 'answer-button';
     btn.innerText = ans.text;
     btn.onclick = () => selectAnswer(i);
+    if (userAnswers[index] === i) {
+      btn.classList.add('selected-answer');
+    }
+    answersDiv.appendChild(btn);
+  });
+  document.getElementById('next-button').disabled = (userAnswers[index] === undefined);
+  const prevBtn = document.getElementById('prev-button');
+  if (index === 0) {
+    prevBtn.style.display = 'none';
+  } else {
+    prevBtn.style.display = '';
+  }
+  const header = document.querySelector('header');
+  const logo = document.getElementById('quiz-logo');
+  const quizTitle = document.getElementById('quiz-title');
+  header.classList.add('small-header');
+  logo.classList.add('visible');
+  quizTitle.style.lineHeight = '52px';
+  quizTitle.style.display = 'inline-block';
+  quizTitle.style.fontSize = '11pt';
+  document.getElementById('prev-button').disabled = (index === 0);
+}
+
+function render() {
+  const q = questions[currentQuestion];
+  const questionElement = document.getElementById('question');
+  const answersDiv = document.getElementById('answers');
+
+  questionElement.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+
+  // پاک کردن پاسخ‌های قبلی
+  answersDiv.innerHTML = '';
+  q.answers.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-button';
+    btn.innerText = ans.text;
+    btn.onclick = () => selectAnswer(i);
 
     // اگر قبلاً این گزینه انتخاب شده بود، استایل انتخاب‌شده به آن بده
-    if (userAnswers[index] === i) {
+    if (userAnswers[currentQuestion] === i) {
       btn.classList.add('selected-answer');
     }
 
     answersDiv.appendChild(btn);
   });
-  // دکمه نکست فقط اگر گزینه‌ای انتخاب شده فعال باشد
-  document.getElementById('next-button').disabled = (userAnswers[index] === undefined);
+  // دکمه نکست فقط اگر گزینه‌ای انتخاب شده بود فعال باشد
+  document.getElementById('next-button').disabled = (userAnswers[currentQuestion] === undefined);
 
   // کنترل نمایش دکمه قبلی
   const prevBtn = document.getElementById('prev-button');
-  if (index === 0) {
+  if (currentQuestion === 0) {
     prevBtn.style.display = 'none';
   } else {
     prevBtn.style.display = '';
@@ -151,7 +214,7 @@ function showQuestion(index) {
   quizTitle.style.display = 'inline-block';
   quizTitle.style.fontSize = '11pt'; // تغییر اندازه فونت هدر هنگام شروع تست
 
-  document.getElementById('prev-button').disabled = (index === 0);
+  document.getElementById('prev-button').disabled = (currentQuestion === 0);
 }
 
 function selectAnswer(answerIndex) {
@@ -221,20 +284,18 @@ function showResult() {
         .filter(item => item.score === maxScore)
         .map(item => item.idx);
 
-    // ساخت HTML نتیجه فقط با سلول(های) برتر
+    // فقط اولین سلول با بیشترین امتیاز را نمایش بده
+    const idx = topCells[0];
     let resultHTML = `<div class="result-box">
         <div class="result-header">
             <span class="result-title">نتیجه تست شخصیت سلولی</span>
-        </div>`;
-    topCells.forEach(idx => {
-        resultHTML += `
+        </div>
         <div class="result-header">
             <span class="result-sticker">${cellStickers[idx]}</span>
             <span class="result-title">${cellNames[idx]}</span>
         </div>
-        <div class="result-desc">${cellResults[idx]}</div>`;
-    });
-    resultHTML += `</div>`;
+        <div class="result-desc">${cellResults[idx]}</div>
+    </div>`;
     document.getElementById('quiz').innerHTML = resultHTML;
 }
 
